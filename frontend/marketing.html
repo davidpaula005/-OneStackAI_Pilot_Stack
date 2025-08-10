@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markedsføring — OneStack Pilot</title><link rel="stylesheet" href="styles.css"></head>
+<section id="marketing-api" style="margin:24px 0">
+  <button id="btnHealth">Test GET /api/marketing</button>
+  <pre id="healthOut">—</pre>
+
+  <form id="campaignForm" style="margin:12px 0">
+    <input name="offer" placeholder="offer">
+    <input name="audience" placeholder="audience">
+    <input name="goal" placeholder="goal">
+    <input name="channel" placeholder="channel">
+    <input name="cta" placeholder="cta">
+    <button type="submit">POST /campaign</button>
+  </form>
+  <pre id="campaignOut">—</pre>
+
+  <form id="videoForm" style="margin:12px 0">
+    <input name="title" placeholder="title" required>
+    <select name="type">
+      <option value="avatar">avatar</option>
+      <option value="generativ">generativ</option>
+    </select>
+    <input name="length" value="30s">
+    <input name="voice" placeholder="voice (optional)">
+    <textarea name="script" placeholder="script (optional)"></textarea>
+    <button type="submit">POST /video</button>
+  </form>
+  <pre id="videoOut">—</pre>
+</section>
+
+<script src="script.js" defer></script>
+
+<section style="margin:24px 0">
+  <h3>Siste kampanjer</h3>
+  <button id="btnLoadCampaigns">Oppdater</button>
+  <table id="tblCampaigns" border="1" cellpadding="6" style="margin-top:8px;border-collapse:collapse">
+    <thead><tr><th>tid</th><th>offer</th><th>audience</th><th>goal</th><th>channel</th><th>cta</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section style="margin:24px 0">
+  <h3>Siste videojobber</h3>
+  <button id="btnLoadVideos">Oppdater</button>
+  <table id="tblVideos" border="1" cellpadding="6" style="margin-top:8px;border-collapse:collapse">
+    <thead><tr><th>tid</th><th>title</th><th>type</th><th>length</th><th>status</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="campaignResults" style="margin:24px 0">
+  <h3>Forslag</h3>
+  <div id="variantGrid" class="grid"></div>
+
+  <h4 style="margin-top:16px">Landing-utkast</h4>
+  <div id="landingBox" class="card"></div>
+</section>
+
+<body><header class="nav"><div class="container nav-inner"><div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">OneStack<span>AI</span></a></div></div></header>
+<main class="container page">
+<h1>Markedsføring</h1>
+<section class="card">
+  <h2>Kampanjebrief</h2>
+  <form id="campaignForm">
+    <div class="form-row"><label>Tilbud</label><input name="offer" placeholder="24/7 booking uten resepsjon"></div>
+    <div class="form-row"><label>Målgruppe</label><input name="audience" placeholder="Klinikker i Oslo"></div>
+    <div class="form-row"><label>Mål</label><input name="goal" placeholder="30 demoer på 30 dager"></div>
+    <div class="form-row"><label>Kanal</label><input name="channel" placeholder="Google/Meta"></div>
+    <div class="form-row"><label>CTA</label><input name="cta" placeholder="Bestill demo"></div>
+    <button class="btn">Generér</button><span id="campaignStatus" class="small muted"></span>
+  </form>
+</section>
+<section id="campaignOutput" style="margin-top:12px"></section>
+
+<section class="card" style="margin-top:12px">
+  <h2>Video-brief</h2>
+  <form id="videoForm">
+    <div class="form-row"><label>Tittel</label><input name="title" placeholder="30s klinikk-annonse"></div>
+    <div class="form-row"><label>Type</label><select name="type"><option value="avatar">Avatar/dubbing</option><option value="generativ">Generativ</option></select></div>
+    <div class="form-row"><label>Voice</label><input name="voice" placeholder="Norsk nøytral"></div>
+    <div class="form-row"><label>Lengde</label><select name="length"><option>15s</option><option>30s</option><option>60s</option></select></div>
+    <div class="form-row"><label>Manus</label><textarea name="script" rows="3"></textarea></div>
+    <button class="btn">Send</button><span id="videoStatus" class="small muted"></span>
+  </form>
+</section>
+<section id="jobs" style="margin-top:12px"></section>
+</main>
+<script src="script.js"></script></body></html>

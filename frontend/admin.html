@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin – OneStackAI Pilot</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Litt ekstra polish som funker uten å røre styles.css */
+    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin: 24px; color: #111; }
+    h1 { font-size: 1.25rem; margin: 0 0 8px; }
+    .row { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+    .card { border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.06); padding: 16px; background: #fff; }
+    .stack { display: grid; gap: 1rem; }
+    .controls input, .controls button { border-radius: 10px; padding: .55rem .75rem; border: 1px solid #ddd; }
+    .controls button { cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+    th { font-weight: 600; color: #333; }
+    .muted { color:#666; font-style: italic; }
+    .danger { color: #b00020; }
+    .btn-danger { background:#fee; border:1px solid #f8caca; }
+    .btn { background:#f7f7f7; border:1px solid #e3e3e3; }
+    @media (max-width: 720px) {
+      .hide-sm { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin</h1>
+
+  <!-- Global statusfelt (ligger over scriptet!) -->
+  <div id="status" class="muted" style="margin: 0 0 12px;"></div>
+
+  <div class="stack">
+    <!-- Campaigns -->
+    <section class="card">
+      <div class="row" style="justify-content: space-between;">
+        <strong>Campaign Requests</strong>
+        <div class="row controls">
+          <input id="qCampaign" type="text" placeholder="Search campaigns…" />
+          <button id="reloadCampaigns" class="btn" title="Reload">Reload</button>
+          <button id="csvCampaigns" class="btn" title="Download CSV">CSV</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto; margin-top: 10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Created</th>
+              <th>Name / Email</th>
+              <th class="hide-sm">Company</th>
+              <th>Message</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbCampaigns"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Videos -->
+    <section class="card">
+      <div class="row" style="justify-content: space-between;">
+        <strong>Video Jobs</strong>
+        <div class="row controls">
+          <input id="qVideos" type="text" placeholder="Search videos…" />
+          <button id="reloadVideos" class="btn" title="Reload">Reload</button>
+          <button id="csvVideos" class="btn" title="Download CSV">CSV</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto; margin-top: 10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Created</th>
+              <th>Title</th>
+              <th class="hide-sm">Status</th>
+              <th class="hide-sm">Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbVideos"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== Config =====
+    const API_BASE = ''; // same-origin
+
+    // ===== Helpers =====
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const setStatus = (t='') => { const el = $('#status'); if (el) el.textContent = t; };
+    const tsName = (prefix) => `${prefix}_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`;
+
+    const dlCSV = (filename, rows, headerOrder) => {
+      if (!rows?.length) {
+        alert('No rows to export.');
+        return;
+      }
+      const keys = headerOrder?.length ? headerOrder : Object.keys(rows[0]);
+      const lines = [
+        keys.join(','), // header
+        ...rows.map(r => keys.map(k => {
+          // CSV-escape
+          const v = r[k] ?? '';
+          const s = String(v).replace(/"/g,'""');
+          return /[",\n]/.test(s) ? `"${s}"` : s;
+        }).join(','))
+      ];
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    const fetchJSON = async (path) => {
+      const r = await fetch(`${API_BASE}${path}`);
+      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+      return r.json();
+    };
+
+    const del = async (path) => {
+      const r = await fetch(`${API_BASE}${path}`, { method: 'DELETE' });
+      // noen av våre endepunkt kan returnere 200/204/404 ved slett, så vi lar ok passere
+      if (!r.ok && r.status !== 404) throw new Error(`Delete failed: ${r.status}`);
+      return true;
+    };
+
+    // ===== Campaigns =====
+    async function loadCampaigns() {
+      setStatus('Loading campaigns…');
+      const q = $('#qCampaign')?.value?.trim().toLowerCase() || '';
+      const data = await fetchJSON('/api/marketing');
+
+      // enkel klient-side søk
+      const rows = !q ? data : data.filter(r => {
+        const hay = `${r.id||''} ${r.name||''} ${r.email||''} ${r.company||''} ${r.message||''}`.toLowerCase();
+        return hay.includes(q);
+      });
+
+      const tb = $('#tbCampaigns');
+      tb.innerHTML = rows.map(r => {
+        const created = r.createdAt ? new Date(r.createdAt).toLocaleString() : '';
+        return `
+          <tr>
+            <td>${r.id||''}</td>
+            <td>${created}</td>
+            <td>
+              <div><strong>${r.name||''}</strong></div>
+              <div class="muted">${r.email||''}</div>
+            </td>
+            <td class="hide-sm">${r.company||''}</td>
+            <td>${(r.message||'').slice(0,200)}</td>
+            <td>
+              <button class="btn btn-danger" data-del="/api/marketing/${r.id}">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // tom-tilstand
+      if (!rows.length) {
+        tb.innerHTML = `<tr><td colspan="6" class="muted">No campaigns found.</td></tr>`;
+      }
+
+      // bind delete
+      tb.querySelectorAll('button[data-del]').forEach(b => {
+        b.onclick = async () => {
+          if (!confirm('Slette?')) return;
+          try {
+            await del(b.getAttribute('data-del'));
+            await loadCampaigns();
+          } catch (e) {
+            alert('Delete failed');
+            console.error(e);
+          }
+        };
+      });
+
+      setStatus('');
+      return rows; // for CSV
+    }
+
+    // ===== Videos =====
+    async function loadVideos() {
+      setStatus('Loading videos…');
+      const q = $('#qVideos')?.value?.trim().toLowerCase() || '';
+      const data = await fetchJSON('/api/videos');
+
+      const rows = !q ? data : data.filter(r => {
+        const hay = `${r.id||''} ${r.title||''} ${r.status||''} ${r.notes||''}`.toLowerCase();
+        return hay.includes(q);
+      });
+
+      const tb = $('#tbVideos');
+      tb.innerHTML = rows.map(r => {
+        const created = r.createdAt ? new Date(r.createdAt).toLocaleString() : '';
+        return `
+          <tr>
+            <td>${r.id||''}</td>
+            <td>${created}</td>
+            <td>${r.title||''}</td>
+            <td class="hide-sm">${r.status||''}</td>
+            <td class="hide-sm">${(r.notes||'').slice(0,200)}</td>
+            <td>
+              <button class="btn btn-danger" data-del="/api/videos/${r.id}">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      if (!rows.length) {
+        tb.innerHTML = `<tr><td colspan="6" class="muted">No videos found.</td></tr>`;
+      }
+
+      tb.querySelectorAll('button[data-del]').forEach(b => {
+        b.onclick = async () => {
+          if (!confirm('Slette?')) return;
+          try {
+            await del(b.getAttribute('data-del'));
+            await loadVideos();
+          } catch (e) {
+            alert('Delete failed');
+            console.error(e);
+          }
+        };
+      });
+
+      setStatus('');
+      return rows; // for CSV
+    }
+
+    // ===== Events & init =====
+    const debounce = (fn, ms=250) => {
+      let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      $('#reloadCampaigns').onclick = () => loadCampaigns().catch(()=>{});
+      $('#reloadVideos').onclick   = () => loadVideos().catch(()=>{});
+
+      $('#qCampaign').oninput = debounce(() => loadCampaigns().catch(()=>{}), 250);
+      $('#qVideos').oninput   = debounce(() => loadVideos().catch(()=>{}), 250);
+
+      $('#csvCampaigns').onclick = async () => {
+        try {
+          const rows = await loadCampaigns();
+          dlCSV(tsName('campaign_requests'), rows, ['id','createdAt','name','email','company','message']);
+        } catch {}
+      };
+      $('#csvVideos').onclick = async () => {
+        try {
+          const rows = await loadVideos();
+          dlCSV(tsName('videos'), rows, ['id','createdAt','title','status','notes']);
+        } catch {}
+      };
+
+      // initial load
+      loadCampaigns().catch(()=>{});
+      loadVideos().catch(()=>{});
+    });
+  </script>
+</body>
+</html>

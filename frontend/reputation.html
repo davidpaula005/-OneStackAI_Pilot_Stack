@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anmeldelser — OneStack Pilot</title><link rel="stylesheet" href="styles.css"></head>
+<body><header class="nav"><div class="container nav-inner"><div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">OneStack<span>AI</span></a></div></div></header>
+<main class="container page">
+<h1>Anmeldelser</h1>
+<section class="card">
+  <h2>Foreslå svar</h2>
+  <form id="repForm">
+    <div class="form-row"><label>Plattform</label><select name="platform"><option>Google</option><option>Facebook</option></select></div>
+    <div class="form-row"><label>Tone</label><select name="tone"><option>vennlig</option><option>formell</option></select></div>
+    <div class="form-row"><label>Anmeldelse</label><textarea name="text" rows="3" placeholder="Dyrt og måtte vente..."></textarea></div>
+    <button class="btn">Foreslå svar</button><span id="repStatus" class="small muted"></span>
+  </form>
+</section>
+<section id="repOut" style="margin-top:12px"></section>
+</main><script src="script.js"></script></body></html>

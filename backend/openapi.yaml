@@ -1,0 +1,44 @@
+openapi: 3.0.3
+info:
+  title: OneStack Pilot API
+  version: 0.1.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/marketing/campaign:
+    post:
+      summary: Generate ad variants and landing copy (mock)
+      requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
+      responses: { "200": { description: OK } }
+  /api/marketing/video:
+    post:
+      summary: Enqueue video job (mock)
+      responses: { "200": { description: OK } }
+  /api/finance/ledger/import:
+    post:
+      summary: Import ledger rows (CSV parsed client-side)
+      responses: { "200": { description: OK } }
+  /api/finance/invoice:
+    post:
+      summary: Create invoice draft (mock EHF totals)
+      responses: { "200": { description: OK } }
+  /api/finance/saft/export:
+    get:
+      summary: Export SAF-T (mock)
+      responses: { "200": { description: OK } }
+  /api/booking/setup:
+    post:
+      summary: Configure booking (deposit/reminders)
+      responses: { "200": { description: OK } }
+  /api/sales/offer:
+    post:
+      summary: Generate Good/Better/Best offer tiers
+      responses: { "200": { description: OK } }
+  /api/reputation/reply:
+    post:
+      summary: Generate a reply suggestion
+      responses: { "200": { description: OK } }
+  /api/integrations/keys:
+    post:
+      summary: Save API keys (ack only in pilot)
+      responses: { "200": { description: OK } }

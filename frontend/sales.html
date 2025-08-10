@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tilbud — OneStack Pilot</title><link rel="stylesheet" href="styles.css"></head>
+<body><header class="nav"><div class="container nav-inner"><div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">OneStack<span>AI</span></a></div></div></header>
+<main class="container page">
+<h1>Tilbud</h1>
+<section class="card">
+  <h2>Bygg tilbud</h2>
+  <form id="offerForm">
+    <div class="form-row"><label>Beskrivelse</label><input name="scope" placeholder="Montering av ..."></div>
+    <div class="form-row"><label>Pris (God)</label><input name="price" type="number" placeholder="25000"></div>
+    <div class="form-row"><label>Garanti</label><input name="warranty" placeholder="12 mnd"></div>
+    <button class="btn">Generér</button><span id="offerStatus" class="small muted"></span>
+  </form>
+</section>
+<section id="offerOut" style="margin-top:12px"></section>
+</main><script src="script.js"></script></body></html>

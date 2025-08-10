@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Booking — OneStack Pilot</title><link rel="stylesheet" href="styles.css"></head>
+<body><header class="nav"><div class="container nav-inner"><div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">OneStack<span>AI</span></a></div></div></header>
+<main class="container page">
+<h1>Booking</h1>
+<section class="card">
+  <h2>Oppsett</h2>
+  <form id="bookForm">
+    <div class="form-row"><label>Kalender</label><select name="calendar"><option>Google</option><option>Outlook</option></select></div>
+    <div class="form-row"><label>Depositum</label><select name="deposit"><option value="true">På</option><option value="false">Av</option></select></div>
+    <div class="form-row"><label>Påminner</label><select name="reminder"><option>24t</option><option>2t</option></select></div>
+    <button class="btn">Aktiver</button><span id="bookStatus" class="small muted"></span>
+  </form>
+</section>
+<section id="bookOut" style="margin-top:12px"></section>
+</main><script src="script.js"></script></body></html>

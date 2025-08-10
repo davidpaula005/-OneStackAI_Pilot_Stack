@@ -1,0 +1,25 @@
+{
+  "name": "onestack-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/min_server.ts",
+    "build": "tsc -p .",
+    "start": "node dist/min_server.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "latest",
+    "@fastify/static": "^8.2.0",
+    "@prisma/client": "^6.13.0",
+    "fastify": "latest",
+    "fastify-type-provider-zod": "latest",
+    "prisma": "^6.13.0",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
+}

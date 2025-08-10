@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Økonomi — OneStack Pilot</title><link rel="stylesheet" href="styles.css"></head>
+<body><header class="nav"><div class="container nav-inner"><div class="brand"><a href="index.html" style="text-decoration:none;color:inherit">OneStack<span>AI</span></a></div></div></header>
+<main class="container page">
+<h1>Økonomi</h1>
+<section class="card">
+  <h2>Importer CSV (hovedbok/bank)</h2>
+  <input id="ledgerCsv" type="file" accept=".csv"><span id="ledgerStatus" class="small muted"></span>
+  <table id="ledgerTable" class="table" style="margin-top:12px"></table>
+</section>
+<section class="card" style="margin-top:12px">
+  <h2>Lag faktura (draft)</h2>
+  <form id="invForm">
+    <div class="form-row"><label>Kunde</label><input name="customer" placeholder="Firmanavn AS"></div>
+    <div class="form-row"><label>E-post (valgfritt)</label><input name="email" type="email"></div>
+    <div id="lines">
+      <div class="form-row"><label>Linje 1</label><input name="line1" placeholder="Arbeidstimer 10 x 950"></div>
+    </div>
+    <button class="btn">Beregn</button><span id="invStatus" class="small muted"></span>
+  </form>
+</section>
+<section class="card" style="margin-top:12px">
+  <h2>Eksporter</h2>
+  <a class="btn" id="saftBtn">Last ned SAF-T (mock)</a>
+</section>
+</main><script src="script.js"></script></body></html>

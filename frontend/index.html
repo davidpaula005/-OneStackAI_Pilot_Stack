@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OneStack AI — Pilot</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="nav">
+  <div class="container nav-inner">
+    <div class="brand">OneStack<span>AI</span></div>
+    <nav>
+      <a href="marketing.html">Markedsføring</a>
+      <a href="reputation.html">Anmeldelser</a>
+      <a href="booking.html">Booking</a>
+      <a href="sales.html">Tilbud</a>
+      <a href="finance.html">Økonomi</a>
+      <a href="reports.html">Rapporter</a>
+      <a href="integrations.html">Integrasjoner</a>
+    </nav>
+  </div>
+</header>
+<main class="container page">
+  <h1>Pilot-UI</h1>
+  <p class="sub">Frontend som snakker med backend-API på <code>http://localhost:3000</code>. Fyll inn API-nøkler under Integrasjoner for å slå på ekte leveranser, ellers kjører vi trygge mock-svar.</p>
+  <div class="grid">
+    <div class="card"><h3>Markedsføring</h3><p>Generér annonser & landingsside, opprett video-jobb.</p><a class="btn" href="marketing.html">Åpne</a></div>
+    <div class="card"><h3>Booking</h3><p>Aktivér kalender + depositum og påminnere.</p><a class="btn" href="booking.html">Åpne</a></div>
+    <div class="card"><h3>Tilbud</h3><p>God/Bedre/Best-tilbud og oppfølging.</p><a class="btn" href="sales.html">Åpne</a></div>
+    <div class="card"><h3>Økonomi</h3><p>Importer CSV, lag utgående faktura, eksporter SAF-T (mock).</p><a class="btn" href="finance.html">Åpne</a></div>
+  </div>
+</main>
+<footer class="container footer"><div>© <span id="year"></span> OneStack AI</div><div class="muted tiny">Pilot demo</div></footer>
+<script src="script.js"></script>
+</body>
+</html>
