@@ -1,39 +1,37 @@
+// backend/src/min_server.ts
 import Fastify from 'fastify';
-import cors from '@fastify/cors';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import fastifyStatic from '@fastify/static';
-import { routes } from './index.js';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import { ZodTypeProvider, validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const app = Fastify({ logger: true });
 
-async function main() {
-  // Fastify + Zod
-  const app = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
-  app.setValidatorCompiler(validatorCompiler);
-  app.setSerializerCompiler(serializerCompiler);
+// ESM __dirname
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const staticRoot = path.resolve(__dirname, '../../frontend');
 
-  // CORS (kan stå på selv om vi snart server frontend fra samme domene)
-  await app.register(cors, { origin: true });
+// Statiske filer (marketing.html, admin.html, styles.css, osv.)
+app.register(fastifyStatic, {
+  root: staticRoot,
+  prefix: '/', // så /admin.html og /marketing.html fungerer
+});
 
-  // ⬇️ Server statiske filer fra ../frontend på rot ('/')
-  await app.register(fastifyStatic, {
-    root: join(__dirname, '..', '..', 'frontend'),
-    prefix: '/',
-    decorateReply: false
-  });
+// Healthcheck
+app.get('/healthz', async () => ({ ok: true }));
 
-  // API-ruter
-  await routes(app);
+// API-ruter
+const routes = (await import('./routes/index.js')).default;
+app.register(routes);
 
-  // Start
-  await app.listen({ host: 'localhost', port: 3000 });
-  console.log('✅ API + Frontend på http://localhost:3000');
+// Start server – VIKTIG: host 0.0.0.0 og Render-port
+const port = Number(process.env.PORT ?? 3000);
+const host = '0.0.0.0';
+
+try {
+  await app.listen({ port, host });
+  console.log(`✅ Server listening on http://${host}:${port}`);
+} catch (err) {
+  app.log.error(err);
+  process.exit(1);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
