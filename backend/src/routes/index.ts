@@ -1,16 +1,23 @@
 // backend/src/routes/index.ts
-
 import type { FastifyInstance } from 'fastify';
 
-// Viktig: bruk .js i import-stien når du bygger ESM fra TypeScript.
-// (TS kompilerer .ts -> .js i dist/, og Node forventer .js i runtime.)
-import marketing from './marketing.js';
-import videos from './videos.js';
-
 export default async function registerRoutes(app: FastifyInstance) {
-  // Alle API-endepunkt under /api
-  app.register(marketing, { prefix: '/api' });
-  app.register(videos, { prefix: '/api' });
+  // Dynamisk import så vi tåler både default- og named-eksporter
+  const mod = await import('./marketing.js');
 
-  // (Hvis du ikke har videos.ts enda, kommenter de to linjene over som gjelder "videos")
+  // Plukk ut plugin-funksjonen uansett navn
+  const plugin =
+    (mod as any).default ??
+    (mod as any).marketing ??
+    (mod as any).routes ??
+    (mod as any).plugin;
+
+  if (typeof plugin !== 'function') {
+    throw new Error('marketing route module does not export a plugin function');
+  }
+
+  // Registrer under /api
+  app.register(plugin, { prefix: '/api' });
+
+  // Merk: vi registrerer ikke /videos her, siden den modulen ikke finnes ennå.
 }
